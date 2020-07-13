@@ -16,6 +16,7 @@ class App extends Component {
     last: "",
     user: "",
     users: [],
+    showNumGames: true,
   };
 
   handleChange = (evt) => {
@@ -24,17 +25,44 @@ class App extends Component {
     });
   };
 
-  addUser = (evt) => {
+  checkUser = (evt) => {
     evt.preventDefault();
-    let newUSer = {
-      firstName: this.state.first,
-      lastName: this.state.last,
-      userName: this.state.user,
+    let newUser = {
+      first: this.state.first,
+      last: this.state.last,
+      user: this.state.user,
       gamesPlayed: 0,
     };
+    const found = this.state.users.find((user) => user.user === newUser.user);
+    if (!found) {
+      this.addUser(newUser);
+    } else {
+      alert("Username already exists");
+      this.setState(() => ({
+        first: "",
+        last: "",
+        user: "",
+      }));
+    }
+  };
+
+  addUser = (user) => {
     this.setState(() => ({
-      users: this.state.users.concat(newUSer),
+      users: this.state.users.concat(user),
+      first: "",
+      last: "",
+      user: "",
     }));
+  };
+
+  toggleState = () => {
+    this.setState((st) => ({
+      showNumGames: !st.showNumGames,
+    }));
+  };
+
+  isEmpty = () => {
+    return this.state.user === "";
   };
 
   render() {
@@ -44,7 +72,7 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">ReactND - Coding Practice</h1>
         </header>
-        <form onSubmit={this.addUser}>
+        <form onSubmit={this.checkUser}>
           <input
             type="text"
             placeholder="Enter First Name"
@@ -66,14 +94,19 @@ class App extends Component {
             name="user"
             onChange={this.handleChange}
           />
-          <button>Add User</button>
+          <button disabled={this.isEmpty()}>Add User</button>
         </form>
-        <button>Show Games Played</button>
+        <button onClick={this.toggleState}>
+          {this.state.showNumGames
+            ? "Hide the Number of Games Played"
+            : "Show the Number of Games Played"}
+        </button>
         <h2>Users</h2>
         <ol>
           {this.state.users.map((user) => (
-            <li>
-              {user.userName} played {user.gamesPlayed} games
+            <li key={user.user}>
+              {user.user} played{" "}
+              {this.state.showNumGames ? user.gamesPlayed : "/*"} games
             </li>
           ))}
         </ol>
